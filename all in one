@@ -1,0 +1,94 @@
+package ja.Hbase;
+
+import java.io.IOException;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.HColumnDescriptor;
+import org.apache.hadoop.hbase.HTableDescriptor;
+import org.apache.hadoop.hbase.MasterNotRunningException;
+import org.apache.hadoop.hbase.TableName;
+import org.apache.hadoop.hbase.ZooKeeperConnectionException;
+import org.apache.hadoop.hbase.client.HBaseAdmin;
+import org.apache.hadoop.hbase.util.Bytes;
+
+import com.google.protobuf.ServiceException;
+
+public class DDLHbaseAdminOps {
+
+	public class HbaseAdminOps{
+		
+		public void createTable(String tablename,String family) throws MasterNotRunningException, ZooKeeperConnectionException, IOException{
+			Configuration conf=HBaseConfiguration.create();
+			HBaseAdmin admin=new HBaseAdmin(conf);
+			if(!admin.isTableAvailable(tablename)){
+			HTableDescriptor desc= new HTableDescriptor(tablename);
+			HColumnDescriptor col=new HColumnDescriptor(family);
+			desc.addFamily(col);
+			admin.createTable(desc);
+			}else{
+				System.out.println("TableAlreadyExists");
+			}
+			
+		}
+		
+		public  void checkStatus() throws ServiceException, MasterNotRunningException, ZooKeeperConnectionException, IOException{
+			Configuration conf=HBaseConfiguration.create();
+			
+			HBaseAdmin.checkHBaseAvailable(conf);
+				System.out.println("running");
+			
+		}
+		
+		public boolean IsTableAvilable(String tablename) throws IOException{
+			Configuration conf=HBaseConfiguration.create();
+			HBaseAdmin admin=new HBaseAdmin(conf);
+			if(admin.isTableAvailable(Bytes.toBytes(tablename))){
+				return true;
+			}else{
+				return false;
+			}
+		}
+			
+		public void EnableTable(String tableName) throws MasterNotRunningException, ZooKeeperConnectionException, IOException{
+			Configuration conf=HBaseConfiguration.create();
+			HBaseAdmin admin=new HBaseAdmin(conf);
+			admin.enableTable(tableName);
+			System.out.println("TableEnabled");
+			
+		}
+		
+		public void DisableTable(String tableName) throws MasterNotRunningException, ZooKeeperConnectionException, IOException{
+			Configuration conf=HBaseConfiguration.create();
+			HBaseAdmin admin=new HBaseAdmin(conf);
+			admin.disableTable(tableName);
+			System.out.println("TableDisabled");
+		}
+		
+		public void DeleteTable(String tableName) throws MasterNotRunningException, ZooKeeperConnectionException, IOException{
+			Configuration conf=HBaseConfiguration.create();
+			HBaseAdmin admin=new HBaseAdmin(conf);
+			admin.deleteTable(tableName);
+			System.out.println("TableDeleted:"+tableName);
+		}
+		
+		public void listTables() throws MasterNotRunningException, ZooKeeperConnectionException, IOException{
+			Configuration conf=HBaseConfiguration.create();
+			HBaseAdmin admin=new HBaseAdmin(conf);
+			TableName[]a=admin.listTableNames();
+			for(TableName t:a){
+				System.out.println(t.getNameAsString());
+			}
+			
+		}
+			public void modifyColumn(String tableName,String desc) throws MasterNotRunningException, ZooKeeperConnectionException, IOException{
+				Configuration conf=HBaseConfiguration.create();
+				HBaseAdmin admin=new HBaseAdmin(conf);
+				HColumnDescriptor descriptor=new HColumnDescriptor("User-details");
+				
+				admin.modifyColumn(tableName, descriptor);
+			}
+		
+
+	}
+}
